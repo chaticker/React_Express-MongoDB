@@ -1,18 +1,32 @@
 const express = require('express')
 const app = express()
 const port = 5000
+const bodyParser = require('body-parser');
+const { User } = require("./models/User");
 
-//mongoose를 이용해서 앱과 몽고디비 연결
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+
+
+
 const mongoose = require('mongoose')
 mongoose.connect('mongodb+srv://chaticker:chacha@youtubeclone.8lxfd.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {
-    //에러 방지용 코드
     useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false
-    //연결이 잘 됐는지 확인
 }).then(() => console.log('MongoDB Connected...'))
   .catch(err => console.log(err))
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
+})
+
+app.post('/register', (req, res) => {
+  const user = new User(req.body)
+  user.save((err, userInfo) =>{
+    if (err) return res.json({ success: false, err }) 
+    return res.status(200).json({
+      success: true
+    }) 
+  }) 
 })
 
 app.listen(port, () => {
